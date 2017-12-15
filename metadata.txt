@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=An Urban Planners Network Analysis Tools
+qgisMinimumVersion=2.14
+description=Tool that uses the Network Analysis Library of QGIS to build a tool that also a not well trained urban player can use.
+version=0.1
+author=Janne Jakob Fleischer
+email=janne.fleischer@googlemail.com
+
+about=Tool that uses the Network Analysis Library of QGIS to build a tool that also a not well trained urban player can use.
+
+tracker=https://github.com/jannefleischer/urbanplannersnetworkanalysis/issues
+repository=https://github.com/jannefleischer/urbanplannersnetworkanalysis
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=networkanalysis, urban, areaofservice
+
+homepage=https://github.com/jannefleischer/urbanplannersnetworkanalysis
+category=Vector
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
