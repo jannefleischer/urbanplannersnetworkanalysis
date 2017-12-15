@@ -3,7 +3,8 @@
 /***************************************************************************
  urbanPlannersNetworkAnalysis
                                  A QGIS plugin
- Tool that uses the Network Analysis Library of QGIS to build a tool that also a not well trained urban player can use.
+ Tool that uses the Network Analysis Library of QGIS to build a tool that even 
+ an in geoinformatics not well trained urban planner can use.
                               -------------------
         begin                : 2017-12-15
         git sha              : $Format:%H$
@@ -20,8 +21,15 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtCore import *
+from PyQt4 import uic, QtGui
+
+from qgis.core import *
+from qgis.gui import *
+from qgis.utils import *
+from qgis.networkanalysis import *
+import processing
+
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
@@ -67,6 +75,7 @@ class urbanPlannersNetworkAnalysis:
         self.toolbar.setObjectName(u'urbanPlannersNetworkAnalysis')
 
     # noinspection PyMethodMayBeStatic
+
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -80,7 +89,6 @@ class urbanPlannersNetworkAnalysis:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('urbanPlannersNetworkAnalysis', message)
-
 
     def add_action(
         self,
@@ -135,8 +143,8 @@ class urbanPlannersNetworkAnalysis:
         # Create the dialog (after translation) and keep reference
         self.dlg = urbanPlannersNetworkAnalysisDialog()
 
-        icon = QIcon(icon_path)
-        action = QAction(icon, text, parent)
+        icon = QtGui.QIcon(icon_path)
+        action = QtGui.QAction(icon, text, parent)
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
 
@@ -168,7 +176,6 @@ class urbanPlannersNetworkAnalysis:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -179,15 +186,85 @@ class urbanPlannersNetworkAnalysis:
         # remove the toolbar
         del self.toolbar
 
-
     def run(self):
         """Run method that performs all the real work"""
         # show the dialog
         self.dlg.show()
+        
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+            self.stuffFromCookbook()
+    
+    def stuffFromCookbook(self):
+#         vl = qgis.utils.iface.mapCanvas().currentLayer()
+        vl = self.dlg.basicNetworkLayer.itemData(self.dlg.basicNetworkLayer.currentIndex())
+        onewayfield = self.dlg.basicNetworkOneWay.itemData(self.dlg.basicNetworkLayer.currentIndex())
+        onewayattribute= self.dlg.basicNetworkOneWayAttribute.itemText(self.dlg.basicNetworkOneWayAttribute.currentIndex())
+        
+#         director = QgsLineVectorLayerDirector(vl, -1, '', '', '', 3)
+        if self.dlg.basicNetworkExplode.isChecked():
+            vl_exploded = processing.runalg('qgis:explodelines', vl, None)['OUTPUT']
+            vl_expl_lyr = self.iface.addVectorLayer(vl_exploded, 'network_exploded', 'ogr')
+            director = QgsLineVectorLayerDirector(vl_expl_lyr, onewayfield[1], onewayattribute, '', '', 3)
+        director = QgsLineVectorLayerDirector(vl, onewayfield[1], onewayattribute, '', '', 3)
+        properter = QgsDistanceArcProperter()
+        director.addProperter(properter)
+        crs = iface.mapCanvas().mapRenderer().destinationCrs()
+        builder = QgsGraphBuilder(crs)
+        
+        origins = self.dlg.basicAreaOrigin.itemData(self.dlg.basicAreaOrigin.currentIndex())
+        for p in origins.getFeatures():
+            ps = {}
+#             pStart = QgsPoint(65.5462, 57.1509)
+            pStart = p.geometry().asPoint()
+            delta = iface.mapCanvas().getCoordinateTransform().mapUnitsPerPixel() * 1
+            
+            """wofür ist das? """
+            rb = QgsRubberBand(iface.mapCanvas(), True) #TODO: in version 3 a geometry ist given as second parameter instead of bool
+            rb.setColor(Qt.green)
+            rb.addPoint(QgsPoint(pStart.x() - delta, pStart.y() - delta))
+            rb.addPoint(QgsPoint(pStart.x() + delta, pStart.y() - delta))
+            rb.addPoint(QgsPoint(pStart.x() + delta, pStart.y() + delta))
+            rb.addPoint(QgsPoint(pStart.x() - delta, pStart.y() + delta))
+            
+            ps[p.id()]=pStart
+            
+        tiedPoints = director.makeGraph(builder, ps.values())
+        graph = builder.graph()
+        tStart = tiedPoints[0]
+        
+        idStart = graph.findVertex(tStart)
+        
+        (tree, cost) = QgsGraphAnalyzer.dijkstra(graph, idStart, 0)
+        
+        upperBound = []
+        distances = [int(e.strip()) for e in self.dlg.basicAreaLimitDistance.text().split(',')]
+        for d in distances:
+#             r = 300.0
+            try:
+                former_r = r
+            except:
+                former_r = 0.0
+            r = float(d)
+            i = 0
+            while i < len(cost):
+                if cost[i] > r and tree[i] != -1:
+                  outVertexId = graph.arc(tree [i]).outVertex()
+                  if cost[outVertexId] < r and cost[outVertexId] >= former_r:
+                    upperBound.append(i)
+                i = i + 1
+            
+            for i in upperBound:
+                centerPoint = graph.vertex(i).point()
+                rb = QgsRubberBand(iface.mapCanvas(), True)
+                if former_r==0.0: rb.setColor(Qt.red)
+                else: rb.setColor(Qt.blue)
+                rb.addPoint(QgsPoint(centerPoint.x() - delta, centerPoint.y() - delta))
+                rb.addPoint(QgsPoint(centerPoint.x() + delta, centerPoint.y() - delta))
+                rb.addPoint(QgsPoint(centerPoint.x() + delta, centerPoint.y() + delta))
+                rb.addPoint(QgsPoint(centerPoint.x() - delta, centerPoint.y() + delta))
+    

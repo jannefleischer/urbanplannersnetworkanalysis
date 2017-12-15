@@ -86,3 +86,6 @@ ENV/
 
 # macOS
 .DS_Store
+
+# urbanplannersnetworkanalysis
+README.txt

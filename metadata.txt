@@ -9,12 +9,12 @@
 [general]
 name=An Urban Planners Network Analysis Tools
 qgisMinimumVersion=2.14
-description=Tool that uses the Network Analysis Library of QGIS to build a tool that also a not well trained urban player can use.
+description=Tool that uses the Network Analysis Library of QGIS to build a tool that even an in geoinformatics not well trained urban player can use. So: Lots of comments and specific use-cases.
 version=0.1
 author=Janne Jakob Fleischer
 email=janne.fleischer@googlemail.com
 
-about=Tool that uses the Network Analysis Library of QGIS to build a tool that also a not well trained urban player can use.
+about=Tool that uses the Network Analysis Library of QGIS to build a tool that even an in geoinformatics not well trained urban player can use. So: Lots of comments and specific use-cases.
 
 tracker=https://github.com/jannefleischer/urbanplannersnetworkanalysis/issues
 repository=https://github.com/jannefleischer/urbanplannersnetworkanalysis
@@ -23,7 +23,7 @@ repository=https://github.com/jannefleischer/urbanplannersnetworkanalysis
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-# changelog=
+# changelog=README.md
 
 # Tags are comma separated with spaces allowed
 tags=networkanalysis, urban, areaofservice
