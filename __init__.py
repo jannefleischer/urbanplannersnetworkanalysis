@@ -22,7 +22,6 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
     """Load urbanPlannersNetworkAnalysis class from file urbanPlannersNetworkAnalysis.
@@ -31,5 +30,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .networkAnalysisForUrbanPlanners import urbanPlannersNetworkAnalysis
+    from urbanplannersnetworkanalysis import urbanPlannersNetworkAnalysis
     return urbanPlannersNetworkAnalysis(iface)

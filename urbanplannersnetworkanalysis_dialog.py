@@ -32,7 +32,7 @@ from qgis.gui import *
 from qgis.utils import *
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'networkAnalysisForUrbanPlanners_dialog_base.ui'))
+    os.path.dirname(__file__), 'urbanplannersnetworkanalysis_dialog_base.ui'))
 
 
 class urbanPlannersNetworkAnalysisDialog(QtGui.QDialog, FORM_CLASS):

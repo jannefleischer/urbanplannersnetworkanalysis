@@ -21,6 +21,14 @@
  *                                                                         *
  ***************************************************************************/
 """
+
+__author__ = 'Janne Jakob Fleischer'
+__date__ = '2017-12-16'
+__copyright__ = '(C) 2017 by Janne Jakob Fleischer'
+
+# This will get replaced with a git SHA1 when you do a git archive
+__revision__ = '$Format:%H$'
+
 from PyQt4.QtCore import *
 from PyQt4 import uic, QtGui
 
@@ -28,18 +36,29 @@ from qgis.core import *
 from qgis.gui import *
 from qgis.utils import *
 from qgis.networkanalysis import *
-import processing
+
+from processing.core.GeoAlgorithm import GeoAlgorithm
+from processing.core.parameters import ParameterVector
+from processing.core.outputs import OutputVector
+from processing.core.Processing import Processing
+from processing.tools import dataobjects, vector
 
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
-from networkAnalysisForUrbanPlanners_dialog import urbanPlannersNetworkAnalysisDialog
-import os.path
+from urbanplannersnetworkanalysis_dialog import urbanPlannersNetworkAnalysisDialog
+# Import the code for the processing algorithm
+from urbanplannersnetworkanalysisProcessingModule_provider import urbanplannersnetworkanalysisProcessingProvider
 
+#this is from the processing plugin template. What does it do?
+# import os.path
+# cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
+# if cmd_folder not in sys.path:
+#     sys.path.insert(0, cmd_folder)
 
 class urbanPlannersNetworkAnalysis:
     """QGIS Plugin Implementation."""
-
+        
     def __init__(self, iface):
         """Constructor.
 
@@ -69,11 +88,12 @@ class urbanPlannersNetworkAnalysis:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&An Urban Planners Network Analysis Tools')
+        self.menu = self.tr(u'Urban Planners Network Analysis Tools')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'urbanPlannersNetworkAnalysis')
         self.toolbar.setObjectName(u'urbanPlannersNetworkAnalysis')
-
+        
+        self.provider = urbanplannersnetworkanalysisProcessingProvider()
     # noinspection PyMethodMayBeStatic
 
     def tr(self, message):
@@ -175,6 +195,8 @@ class urbanPlannersNetworkAnalysis:
             text=self.tr(u'Urban Planners Network Analysis'),
             callback=self.run,
             parent=self.iface.mainWindow())
+        
+        Processing.addProvider(self.provider)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -185,6 +207,7 @@ class urbanPlannersNetworkAnalysis:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
+        Processing.removeProvider(self.provider)
 
     def run(self):
         """Run method that performs all the real work"""

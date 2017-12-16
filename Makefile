@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	networkAnalysisForUrbanPlanners.py networkAnalysisForUrbanPlanners_dialog.py
+	urbanplannersnetworkanalysis.py urbanplannersnetworkanalysis_dialog.py urbanplannersnetworkanalysisProcessingModule_algorithm.py urbanplannersnetworkanalysisProcessingModule_provider.py
 
-PLUGINNAME = urbanPlannersNetworkAnalysis
+PLUGINNAME = urbanplannersnetworkanalysis
 
 PY_FILES = \
 	__init__.py \
-	networkAnalysisForUrbanPlanners.py networkAnalysisForUrbanPlanners_dialog.py
+	urbanplannersnetworkanalysis.py urbanplannersnetworkanalysis_dialog.py urbanplannersnetworkanalysisProcessingModule_algorithm.py urbanplannersnetworkanalysisProcessingModule_provider.py
 
-UI_FILES = networkAnalysisForUrbanPlanners_dialog_base.ui
+UI_FILES = urbanplannersnetworkanalysis_dialog_base.ui
 
 EXTRAS = metadata.txt icon.png
 
