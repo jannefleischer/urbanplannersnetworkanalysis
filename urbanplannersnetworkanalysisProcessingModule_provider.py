@@ -81,7 +81,7 @@ class urbanplannersnetworkanalysisProcessingProvider(AlgorithmProvider):
     def getDescription(self):
         """This is the provired full name.
         """
-        return 'Creates Areas of Service'
+        return 'Urban Planners Network Analysis'
 
     def getIcon(self):
         """We return the default icon.
